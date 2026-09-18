@@ -53,3 +53,30 @@ python -m py_compile app.py
 ```
 
 Always run the verification command before claiming a task is complete.
+
+## Audit Remediation Notes
+
+- Audit path: $AuditFile
+- Risk level from audit: $risk.
+- Addressed audit issues: Spreadsheet/data export files found: audit_trail.xlsx, audit_trail_with_tools_populated_demo_v2.xlsx, audit_trail_with_tools_populated_demo_v3.xlsx; Multiple AI provider integrations (anthropic, gemini, google.generativeai, openai) — elevated orchestration complexity.; Credential pattern indicators in code: api_key, database_url; External database terms detected (postgres) — potential data compliance risk.; Risk level is HIGH, expected LOW.; Dependency manifests present: requirements.txt; Container configuration present (Dockerfile / docker-compose).; HTTP networking libraries in use: httpx
+
+
+## AI Provider Boundary
+
+AI providers detected by audit: anthropic, gemini, google.generativeai, openai. Use providers only for the repository's documented workflow. API keys must be supplied through environment variables or managed platform secrets, never committed or echoed. Do not add redundant providers without human approval.
+
+
+## Database Compliance Boundary
+
+Database terms detected by audit: postgres. Treat database integrations as compliance-sensitive. Confirm connection strings are environment-driven, avoid production credentials, and get human approval before changing schemas, migrations, retention, or production data access.
+
+
+## Data Export Boundary
+
+Spreadsheet/data export files detected by audit: audit_trail.xlsx, audit_trail_with_tools_populated_demo_v2.xlsx, audit_trail_with_tools_populated_demo_v3.xlsx, audit_trail_with_tools_populated_demo_v4.xlsx, audit_trail_with_tools_v1.xlsx, brand_model_agg.xlsx, brand_model_aggregation.xlsx, device_data.xlsx, fft_demo_brands_updated.xlsx, gdpr_violations.xlsx, r2v3_violations.xlsx, seed/devicepassport_catalog.xlsx, seed/seed/devicepassport_catalog.xlsx, sensor_timeseries.xlsx. Keep generated exports gitignored unless they are documented fixtures. Do not replace synthetic/sample fixtures with real operational data.
+
+
+## Human Review Required
+
+This audit classified the repo as HIGH risk. Agents may draft governance/documentation updates, but credential, provider, database, deployment, and data-export remediation requires human review before code or data changes.
+
