@@ -1,0 +1,1 @@
+- P3: compliance checks add a risk tier — low-risk drift is auto-logged; high-risk breach is routed to human review.

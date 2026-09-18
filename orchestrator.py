@@ -7,6 +7,7 @@ from arbiter import BlindArbiter
 from meta_reviewer import MetaReviewer
 from audit_logger import AuditLogger
 from llm_client import verify_llm_provider_available
+from tools import classify_compliance_tier, evaluate_gdpr_flags, evaluate_r2v3_risk
 
 class Orchestrator:
     def __init__(self):
@@ -40,11 +41,21 @@ class Orchestrator:
         meta = self.meta.review(arb, device, cove)
         self.logger.log_section("META", meta)
 
+        r2_score = evaluate_r2v3_risk(device).get("r2v3_risk_score", 0)
+        gdpr_score = evaluate_gdpr_flags(device).get("gdpr_risk_score", 0)
+        tier = classify_compliance_tier(
+            r2_score=r2_score,
+            gdpr_score=gdpr_score,
+            arbiter_rating=arb.get("risk_rating") or arb.get("arbiter_risk_rating"),
+        )
+        self.logger.log_section("COMPLIANCE_TIER", tier)
         rec = {
             "run_id": rid, "timestamp": datetime.datetime.utcnow().isoformat(),
             "final_narrative": meta.get("adjusted_narrative", arb["fused_narrative"]),
             "final_uncertainty": meta.get("final_uncertainty", arb["fused_uncertainty"]),
-            "details": {"r1": r1, "r2": r2, "cove": cove, "arb": arb, "meta": meta}
+            "details": {"r1": r1, "r2": r2, "cove": cove, "arb": arb, "meta": meta},
+            "risk_tier": tier["risk_tier"],
+            "review_route": tier["review_route"],
         }
         self.logger.log_section("FINAL", rec)
         self.logger.end_run()

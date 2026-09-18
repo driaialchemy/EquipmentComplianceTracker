@@ -9,13 +9,44 @@ from scipy.signal import welch
 # Existing "compliance" tools
 # (kept simple; your agents expect these names)
 # ----------------------------
+HIGH_RISK_R2_THRESHOLD = 20.0
+HIGH_RISK_GDPR_THRESHOLD = 30.0
+HIGH_ARBITER_RATINGS = {"high", "critical"}
+
+
+def classify_compliance_tier(
+    r2_score: float = 0.0,
+    gdpr_score: float = 0.0,
+    arbiter_rating: Optional[str] = None,
+) -> Dict[str, Any]:
+    rating = str(arbiter_rating or "").strip().lower()
+    high = (
+        float(r2_score or 0) >= HIGH_RISK_R2_THRESHOLD
+        or float(gdpr_score or 0) >= HIGH_RISK_GDPR_THRESHOLD
+        or rating in HIGH_ARBITER_RATINGS
+    )
+    if high:
+        return {
+            "risk_tier": "high",
+            "review_route": "human_review",
+            "disposition": "breach",
+        }
+    return {
+        "risk_tier": "low",
+        "review_route": "auto_logged",
+        "disposition": "drift",
+    }
+
+
 def evaluate_r2v3_risk(device_dict: Dict[str, Any]) -> Dict[str, Any]:
     flags = device_dict.get("r2v3_flags") or {}
     score = 0
     for _, v in flags.items():
         if v:
             score += 10
-    return {"r2v3_flag_count": int(sum(1 for v in flags.values() if v)), "r2v3_risk_score": float(score)}
+    result = {"r2v3_flag_count": int(sum(1 for v in flags.values() if v)), "r2v3_risk_score": float(score)}
+    result.update(classify_compliance_tier(r2_score=score))
+    return result
 
 
 def evaluate_gdpr_flags(device_dict: Dict[str, Any]) -> Dict[str, Any]:
@@ -24,7 +55,9 @@ def evaluate_gdpr_flags(device_dict: Dict[str, Any]) -> Dict[str, Any]:
     for _, v in flags.items():
         if v:
             risk += 15
-    return {"gdpr_flag_count": int(sum(1 for v in flags.values() if v)), "gdpr_risk_score": float(risk)}
+    result = {"gdpr_flag_count": int(sum(1 for v in flags.values() if v)), "gdpr_risk_score": float(risk)}
+    result.update(classify_compliance_tier(gdpr_score=risk))
+    return result
 
 
 def evaluate_gdpr_violation_patterns(device_dict: Dict[str, Any]) -> Dict[str, Any]:

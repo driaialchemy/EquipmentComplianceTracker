@@ -280,8 +280,8 @@ def run_and_persist_audit(device_id: str, payload: dict) -> dict:
     result = orch.run_device_audit(payload)
     persist_run(result["run_id"], device_id)
     persist_audit_result(result, device_id)
-    from governance_logger import log_success
-    log_success("Device-Lifecycle-Intelligence-Platform-DLIP-", "Agent completed successfully", {
+    from governance_logger import require_approval
+    require_approval("Device-Lifecycle-Intelligence-Platform-DLIP-", "Agent completed successfully", {
         "device_id": device_id,
         "run_id": result.get("run_id"),
         "result": result
