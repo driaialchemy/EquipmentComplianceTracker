@@ -25,3 +25,6 @@ db/*.sqlite3
 
 .DS_Store
 Thumbs.db
+*.xlsx
+*.xls
+*.csv
