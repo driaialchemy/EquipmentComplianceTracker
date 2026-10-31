@@ -4,10 +4,10 @@ demo_spreadsheet_app.py
 Spreadsheet-driven UI for the Device Passport Multi-Agent Audit.
 
 Features:
-- Uses device_data.xlsx (same folder) by default, or user upload (.xlsx/.csv).
+- Uses sample_data/device_data.xlsx by default, or user upload (.xlsx/.csv).
 - Single-device audit: runs full multi-agent pipeline via Orchestrator.
 - Batch audits: run multi-agent audits over multiple devices and show a risk dashboard.
-- Sensor / FFT visualization: accelerometer time series + FFT from sensor_timeseries.xlsx.
+- Sensor / FFT visualization: accelerometer time series + FFT from sample_data/sensor_timeseries.xlsx.
 
 No JSON, no dict paste.
 """
@@ -31,8 +31,8 @@ from tools import evaluate_r2v3_risk  # for simple risk band on dashboard
 # --------------------------------------------------------------------
 
 BASE_DIR = Path(__file__).parent
-DEFAULT_SPREADSHEET = BASE_DIR / "device_data.xlsx"
-SENSOR_TIMESERIES = BASE_DIR / "sensor_timeseries.xlsx"
+DEFAULT_SPREADSHEET = BASE_DIR / "sample_data" / "device_data.xlsx"
+SENSOR_TIMESERIES = BASE_DIR / "sample_data" / "sensor_timeseries.xlsx"
 
 
 # --------------------------------------------------------------------
@@ -203,7 +203,7 @@ Back-end stack (unchanged):
 
     # Upload or use default spreadsheet
     uploaded_file = st.file_uploader(
-        "Upload a device spreadsheet (.xlsx, .xls, .csv), or leave empty to use device_data.xlsx",
+        "Upload a device spreadsheet (.xlsx, .xls, .csv), or leave empty to use sample_data/device_data.xlsx",
         type=["xlsx", "xls", "csv"],
     )
 
@@ -224,7 +224,7 @@ Back-end stack (unchanged):
         except Exception as exc:
             error_msg = (
                 f"Could not load default spreadsheet '{DEFAULT_SPREADSHEET.name}': {exc}\n\n"
-                "Place device_data.xlsx in the same folder as this script, or upload a file above."
+                "Place device_data.xlsx in sample_data/, or upload a file above."
             )
 
     if error_msg:
@@ -395,8 +395,8 @@ Back-end stack (unchanged):
         ts_df = load_sensor_timeseries()
         if ts_df is None:
             st.warning(
-                f"sensor_timeseries.xlsx not found or could not be loaded.\n"
-                f"Place it next to this file as: {SENSOR_TIMESERIES.name}"
+                "sample_data/sensor_timeseries.xlsx not found or could not be loaded.\n"
+                f"Expected path: {SENSOR_TIMESERIES}"
             )
         else:
             # device IDs present in timeseries
@@ -404,7 +404,7 @@ Back-end stack (unchanged):
             ts_device_ids = sorted(ts_df["device_id"].unique().tolist())
 
             if not ts_device_ids:
-                st.warning("No device_ids found in sensor_timeseries.xlsx.")
+                st.warning("No device_ids found in sample_data/sensor_timeseries.xlsx.")
             else:
                 selected_ts_id = st.selectbox(
                     "Select device_id for sensor visualization (accelerometer)",

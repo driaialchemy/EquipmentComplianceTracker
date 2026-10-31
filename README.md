@@ -81,4 +81,8 @@ Optional seed overrides:
 ## 6. Run app
 ```bash
 streamlit run app.py
+
+## Sample data
+
+Demo workbooks live in `sample_data/` (audit trails, device tables, sensor series, and violation fixtures). They are synthetic device-compliance fixtures: public brand names, token device ids, and no personal contact fields. The seed catalog stays at `seed/devicepassport_catalog.xlsx` because `docker-compose.yml` pins that path and container config was left unchanged. A nested copy remains at `seed/seed/devicepassport_catalog.xlsx`.
 ```
