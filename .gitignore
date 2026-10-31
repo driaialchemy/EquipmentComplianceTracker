@@ -28,3 +28,11 @@ Thumbs.db
 *.xlsx
 *.xls
 *.csv
+
+# governance baseline ignores
+venv/
+node_modules/
+*.log
+reports/
+audit_temp/
+generated/

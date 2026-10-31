@@ -60,3 +60,16 @@ audit_findings:
   - "Container configuration present (Dockerfile / docker-compose)."
   - "HTTP networking libraries in use: httpx"
 
+## Approval gates
+
+Human approval is required before dependency changes, external-call changes, deploy or container config, secrets, and AI-provider or database config.
+
+## Setup
+
+pip install -r requirements.txt
+Copy `.env.example` to `.env` locally. No pytest suite; compile with `python -m py_compile app.py`.
+
+## Sample data
+
+Demo workbooks live in `sample_data/`. The seed catalog stays at `seed/devicepassport_catalog.xlsx` because container config pins that path.
+
